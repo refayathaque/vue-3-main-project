@@ -1,9 +1,12 @@
 <template>
-  register
+  <coach-form></coach-form>
 </template>
 
 <script>
-export default {};
+import CoachForm from "../../components/coaches/CoachForm.vue";
+export default {
+  components: { CoachForm },
+};
 </script>
 
 <style></style>
