@@ -4,7 +4,7 @@
     <base-card>
       <div class="controls">
         <base-button mode="outline">Refresh</base-button>
-        <base-button link to="/register">Register as coach</base-button>
+        <base-button v-if="!isCoach" link to="/register">Register as coach</base-button>
       </div>
       <ul v-if="hasCoaches">
         <li v-for="coach in filteredCoaches" :key="coach.id">
@@ -37,34 +37,34 @@ export default {
         frontend: true,
         backend: true,
         career: true,
-      }
-    }
+      },
+    };
   },
   computed: {
-    ...mapGetters("coachesModule", ["coaches", "hasCoaches"]),
+    ...mapGetters("coachesModule", ["coaches", "hasCoaches", "isCoach"]),
     filteredCoaches() {
       return this.coaches.filter((coach) => {
-        if (this.activeFilters.frontend && coach.areas.includes('frontend')) {
-          return true
+        if (this.activeFilters.frontend && coach.areas.includes("frontend")) {
+          return true;
           // The filter() method creates a new array with all elements that pass the test implemented by the provided function.
           // returning true is sufficient because the method innately creates a new array with values that pass the condition (i.e., `return true`)
         }
-        if (this.activeFilters.backend && coach.areas.includes('backend')) {
-          return true
+        if (this.activeFilters.backend && coach.areas.includes("backend")) {
+          return true;
         }
-        if (this.activeFilters.career && coach.areas.includes('career')) {
-          return true
+        if (this.activeFilters.career && coach.areas.includes("career")) {
+          return true;
         } else {
-          return false
+          return false;
         }
-      })
-    }
+      });
+    },
   },
   methods: {
     setFilters(updatedFilters) {
-      this.activeFilters = updatedFilters
-    }
-  }
+      this.activeFilters = updatedFilters;
+    },
+  },
 };
 </script>
 

@@ -32,7 +32,7 @@ export default {
       const inputId = target.id
       const isActive = target.checked
       const updatedFilters = {
-        ...this.filters, // using spread operator to copy the `filters` data property here to make changes
+        ...this.filters, // using spread operator to copy the `filters` data property here and then make changes (just dynamically setting a new property value)
         [inputId]: isActive
       }
       this.filters = updatedFilters

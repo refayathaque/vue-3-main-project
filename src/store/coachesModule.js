@@ -31,7 +31,23 @@ export default {
     hasCoaches({ coaches }) {
       return coaches && coaches.length > 0;
     },
+    isCoach({coaches}, _, _2, { userId }) {
+      return coaches.some(coach => coach.id === userId)
+      // returns true if it finds at least one coach that has the same id as the `userId` root state property
+    }
   },
-  actions: {},
-  mutations: {},
+  actions: {
+    registerCoach(context, payload) {
+      const newCoachData = {
+        ...payload, // using spread operator to copy payload here and then make changes (just adding a new property `id` to the obj)
+        id: context.rootGetters.userId
+      }
+      context.commit('registerCoach', newCoachData)
+    }
+  },
+  mutations: {
+    registerCoach(state, payload) {
+      state.coaches.push(payload)
+    }
+  },
 };
