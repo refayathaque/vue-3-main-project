@@ -1,12 +1,16 @@
 <template>
   <form @submit.prevent="submitForm">
     <div class="form-control">
-      <label for='email'>Your email</label>
-      <input type="email" id="email"  v-model.trim="email"/>
+      <label for="email">Your email</label>
+      <input type="email" id="email" v-model.trim="email" />
     </div>
     <div class="form-control">
-      <label for='message'>Your message</label>
-      <textarea type="message" id="message" rows="5" v-model.trim="message"></textarea>
+      <label for="message">Your message</label>
+      <textarea
+        id="message"
+        rows="5"
+        v-model.trim="message"
+      ></textarea>
     </div>
     <div class="actions">
       <base-button>Send message</base-button>
@@ -15,22 +19,31 @@
 </template>
 
 <script>
-import BaseButton from '../../components/ui/BaseButton.vue'
+import BaseButton from "../../components/ui/BaseButton.vue";
+import { mapActions } from "vuex";
 export default {
   components: { BaseButton },
+  props: ["id"],
   data() {
     return {
-      email: '',
-      message: '',
-    }
+      email: "",
+      message: "",
+    };
   },
   methods: {
     submitForm() {
-      
-    }
-  }
-
-}
+      const formData = {
+        coachId: this.id,
+        email: this.email,
+        message: this.message,
+      };
+      this.addRequest(formData);
+      this.$router.replace("/coaches"); // programmatic nav without allowing user to go back
+    },
+    ...mapActions("requestsModule", ["addRequest"]),
+    //
+  },
+};
 </script>
 
 <style scoped>
