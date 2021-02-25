@@ -23,7 +23,9 @@ import RequestItem from "../../components/requests/RequestItem.vue";
 
 export default {
   components: { BaseCard, RequestItem },
-  ...mapGetters("requestsModule", ["requests", "hasRequests"]),
+  computed: {
+    ...mapGetters("requestsModule", ["requests", "hasRequests"]),
+  }
 };
 </script>
 

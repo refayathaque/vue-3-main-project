@@ -6,13 +6,14 @@ export default {
     };
   },
   getters: {
-     requests({ requests }) {
-       console.log(requests)
-       return requests;
+     requests({ requests }, _, _2, rootGetters) {
+       const { userId: coachId } = rootGetters;
+       return requests.filter(request => request.coachId === coachId);
+       // only want to show requests to the user that is logged in
      },
-     hasRequests({ requests }) {
-       console.log(requests && requests.length > 0)
+     hasRequests(_, { requests }) {
        return requests && requests.length > 0
+       // using filtered requests value above from getter (not all requests in module state) hence `getters.requests`
        // will return true if there is at least 1 request
      }
   },
