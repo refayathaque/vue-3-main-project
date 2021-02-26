@@ -37,11 +37,24 @@ export default {
     }
   },
   actions: {
-    registerCoach(context, payload) {
+    async registerCoach(context, payload) {
+      const userId = context.rootGetters.userId
       const newCoachData = {
         ...payload, // using spread operator to copy payload here and then make changes (just adding a new property `id` to the obj)
-        id: context.rootGetters.userId
+        id: userId
       }
+
+      const response = await fetch(`https://vue-coach-finder-2-default-rtdb.firebaseio.com/coaches/${userId}.json`, {
+        method: 'PUT',
+        body: JSON.stringify(newCoachData)
+      })
+
+      // const responseData = await response.json() // .json() also returns a promise so that's why we need to await again
+
+      if (!response.ok) {
+        console.log(response)
+      }
+
       context.commit('registerCoach', newCoachData)
     }
   },
