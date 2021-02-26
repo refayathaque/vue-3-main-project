@@ -18,18 +18,65 @@ export default {
      }
   },
   actions: {
-    addRequest({ commit }, payload) {
+    async addRequest({ commit }, payload) {
       const newRequest = {
         ...payload,
-        id: new Date().toISOString()
+        // id: new Date().toISOString()
+        // firebase will create a proper id for request
       }
+
+      const response = await fetch(`https://vue-coach-finder-2-default-rtdb.firebaseio.com/requests/${payload.coachId}.json`, {
+        method: 'POST',
+        body: JSON.stringify(newRequest)
+      })
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        const error = new Error(responseData.message || 'Failed to send request');
+        throw error
+      }
+
+      newRequest.id = responseData.name // taking id created by firebase and adding to `newRequest` before committing to mutation to then go into state
+
       commit('addRequest', newRequest)
+    },
+    async loadRequests({ commit, rootGetters }) {
+      const coachId = rootGetters.userId
+      
+      const response = await fetch(
+        `https://vue-coach-finder-2-default-rtdb.firebaseio.com/requests/${coachId}.json`
+        );
+      // we only want to fetch requests associated with the user that is logged
+
+      const responseData = await response.json(); // .json() also returns a promise so that's why we need to await again
+
+      if (!response.ok) {
+        const error = new Error(responseData.message || 'Failed to fetch requests!')
+        throw error
+      }
+
+      let requests = []
+
+      for (const key in responseData) {
+        const request = {
+          id: key,
+          coachId: responseData[key].coachId,
+          email: responseData[key].email,
+          message: responseData[key].message,
+        }
+        requests.push(request)
+      }
+
+      commit('setRequests', requests)
     }
   },
   mutations: {
     addRequest({ requests }, payload) {
       requests.push(payload)
-      console.log(requests)
-    }
+    },
+    setRequests(state, payload) {
+      state.requests = payload;
+    },
   },
 };
