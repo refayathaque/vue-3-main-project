@@ -2,6 +2,7 @@ export default {
   namespaced: true,
   state() {
     return {
+      lastFetch: null,
       coaches: [
         {
           id: "c1",
@@ -35,6 +36,14 @@ export default {
       return coaches.some((coach) => coach.id === userId);
       // returns true if it finds at least one coach that has the same id as the `userId` root state property
     },
+    shouldUpdate({ lastFetch }) {
+      if (!lastFetch) {
+        return true
+      }
+      const currentTimestamp = new Date().getTime();
+      return (currentTimestamp - lastFetch) / 1000 > 60;
+      // checking to see if `lastFetch` occurred more than a minute ago
+    }
   },
   actions: {
     async registerCoach(context, payload) {
@@ -47,7 +56,7 @@ export default {
       const response = await fetch(
         `https://vue-coach-finder-2-default-rtdb.firebaseio.com/coaches/${userId}.json`,
         {
-          method: "PUT",
+          method: "PUT", // firebase will not create it's own id for PUTs
           body: JSON.stringify(newCoachData),
         }
       );
@@ -60,7 +69,11 @@ export default {
 
       context.commit("registerCoach", newCoachData);
     },
-    async loadCoaches(context) {
+    async loadCoaches(context, { forceRefresh }) {
+      if (!forceRefresh && !context.getters.shouldUpdate) {
+        return;
+      }
+
       const response = await fetch(
         `https://vue-coach-finder-2-default-rtdb.firebaseio.com/coaches.json`
       );
@@ -68,8 +81,8 @@ export default {
       const responseData = await response.json(); // .json() also returns a promise so that's why we need to await again
 
       if (!response.ok) {
-        const error = new Error(responseData.message || 'Failed to fetch!')
-        throw error
+        const error = new Error(responseData.message || "Failed to fetch!");
+        throw error;
       }
 
       let coaches = [];
@@ -88,14 +101,18 @@ export default {
       // firebase returns an object with kv pairs for each coach, but we want the coaches to be objects in an array
 
       context.commit("setCoaches", coaches);
+      context.commit("setFetchTimestamp")
     },
   },
   mutations: {
-    registerCoach(state, payload) {
-      state.coaches.push(payload);
+    registerCoach({ coaches }, payload) {
+      coaches.push(payload);
     },
     setCoaches(state, payload) {
       state.coaches = payload;
+    },
+    setFetchTimestamp(state) {
+      state.lastFetch = new Date().getTime();
     },
   },
 };
