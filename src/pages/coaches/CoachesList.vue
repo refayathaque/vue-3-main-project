@@ -1,38 +1,44 @@
 <template>
-  <base-dialog :show="!!error" title="An error occurred!" @close="handleError">
-  <!-- since the `show` directive wants a boolean we need to force a boolean out of the `error` data property (which can be null or a string) using !! (using just 1 ! would be the opposite, and we don't want that here) -->
-    {{ error }}
-  </base-dialog>
-  <section>
-    <coach-filter @change-filter="setFilters"></coach-filter>
-  </section>
-  <section>
-    <base-card>
-      <div class="controls">
-        <base-button mode="outline" @click="handleLoadCoaches(true)"
-          >Refresh</base-button
-        >
-        <base-button v-if="!isCoach && !isLoading" link to="/register"
-          >Register as coach</base-button
-        >
-        <!-- register button should only display if the user is not a registered coach and also when data is NOT loading -->
-      </div>
-      <div v-if="isLoading"><base-spinner></base-spinner></div>
-      <ul v-else-if="handleHasCoaches">
-        <li v-for="coach in filteredCoaches" :key="coach.id">
-          <!-- https://v3.vuejs.org/style-guide/#prop-name-casing-strongly-recommended -->
-          <coach-item
-            :id="coach.id"
-            :first-name="coach.firstName"
-            :last-name="coach.lastName"
-            :hourly-rate="coach.hourlyRate"
-            :areas="coach.areas"
-          ></coach-item>
-        </li>
-      </ul>
-      <h3 v-else>No coaches found</h3>
-    </base-card>
-  </section>
+  <div>
+    <base-dialog
+      :show="!!error"
+      title="An error occurred!"
+      @close="handleError"
+    >
+      <!-- since the `show` directive wants a boolean we need to force a boolean out of the `error` data property (which can be null or a string) using !! (using just 1 ! would be the opposite, and we don't want that here) -->
+      {{ error }}
+    </base-dialog>
+    <section>
+      <coach-filter @change-filter="setFilters"></coach-filter>
+    </section>
+    <section>
+      <base-card>
+        <div class="controls">
+          <base-button mode="outline" @click="handleLoadCoaches(true)"
+            >Refresh</base-button
+          >
+          <base-button v-if="!isCoach && !isLoading" link to="/register"
+            >Register as coach</base-button
+          >
+          <!-- register button should only display if the user is not a registered coach and also when data is NOT loading -->
+        </div>
+        <div v-if="isLoading"><base-spinner></base-spinner></div>
+        <ul v-else-if="handleHasCoaches">
+          <li v-for="coach in filteredCoaches" :key="coach.id">
+            <!-- https://v3.vuejs.org/style-guide/#prop-name-casing-strongly-recommended -->
+            <coach-item
+              :id="coach.id"
+              :first-name="coach.firstName"
+              :last-name="coach.lastName"
+              :hourly-rate="coach.hourlyRate"
+              :areas="coach.areas"
+            ></coach-item>
+          </li>
+        </ul>
+        <h3 v-else>No coaches found</h3>
+      </base-card>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -42,9 +48,16 @@ import BaseCard from "../../components/ui/BaseCard.vue";
 import BaseButton from "../../components/ui/BaseButton.vue";
 import CoachFilter from "../../components/coaches/CoachFilter.vue";
 import BaseSpinner from "../../components/ui/BaseSpinner.vue";
-import BaseDialog from '../../components/ui/BaseDialog.vue';
+import BaseDialog from "../../components/ui/BaseDialog.vue";
 export default {
-  components: { CoachItem, BaseCard, BaseButton, CoachFilter, BaseSpinner, BaseDialog },
+  components: {
+    CoachItem,
+    BaseCard,
+    BaseButton,
+    CoachFilter,
+    BaseSpinner,
+    BaseDialog,
+  },
   data() {
     return {
       isLoading: false,
@@ -95,8 +108,8 @@ export default {
     },
     ...mapActions("coachesModule", ["loadCoaches"]),
     handleError() {
-      this.error = null
-    }
+      this.error = null;
+    },
   },
   created() {
     this.handleLoadCoaches();
