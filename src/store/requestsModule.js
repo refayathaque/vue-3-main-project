@@ -45,8 +45,10 @@ export default {
     async loadRequests({ commit, rootGetters }) {
       const coachId = rootGetters['authModule/userId']
       
+      const token = rootGetters['authModule/token']
+
       const response = await fetch(
-        `https://vue-coach-finder-2-default-rtdb.firebaseio.com/requests/${coachId}.json`
+        `https://vue-coach-finder-2-default-rtdb.firebaseio.com/requests/${coachId}.json?auth=${token}`
         );
       // we only want to fetch requests associated with the user that is logged
 

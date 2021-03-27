@@ -50,13 +50,16 @@ export default {
   actions: {
     async registerCoach(context, payload) {
       const userId = context.rootGetters['authModule/userId'];
+
       const newCoachData = {
         ...payload, // using spread operator to copy payload here and then make changes (just adding a new property `id` to the obj)
         id: userId,
       };
 
+      const token = context.rootGetters['authModule/token']
+
       const response = await fetch(
-        `https://vue-coach-finder-2-default-rtdb.firebaseio.com/coaches/${userId}.json`,
+        `https://vue-coach-finder-2-default-rtdb.firebaseio.com/coaches/${userId}.json?auth=${token}`,
         {
           method: "PUT", // firebase will not create it's own id for PUTs
           body: JSON.stringify(newCoachData),
