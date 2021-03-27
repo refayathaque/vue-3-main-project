@@ -1,23 +1,90 @@
+import api from "./api.js";
+
 export default {
   namespaced: true,
   state() {
     return {
-      userId: "c2",
+      userId: null,
+      token: null,
+      tokenExpiration: null,
     };
   },
   getters: {
     userId({ userId }) {
       return userId;
     },
+    token({ token }) {
+      return token;
+    },
   },
   actions: {
-    login() {
+    async login(context, { email, password }) {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${api.WEB_API_KEY}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
+          }),
+        }
+      );
+      
+      const responseData = await response.json();
 
+      if (!response.ok) {
+        console.log(responseData);
+        const error = new Error(
+          responseData.message || "Failed to authenticate."
+        );
+        throw error;
+      }
+
+      console.log(responseData);
+      context.commit("setUser", {
+        token: responseData.idToken,
+        userId: responseData.localId,
+        tokenExpiration: responseData.expiresIn,
+      });
     },
-    signup(context, payload) {
-      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=[API_KEY]
-      ', )
+    async signUp(context, { email, password }) {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${api.WEB_API_KEY}`,
+
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
+          }),
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.log(responseData);
+        const error = new Error(
+          responseData.message || "Failed to authenticate."
+        );
+        throw error;
+      }
+
+      console.log(responseData);
+      context.commit("setUser", {
+        token: responseData.idToken,
+        userId: responseData.localId,
+        tokenExpiration: responseData.expiresIn,
+      });
     },
   },
-  mutations: {},
+  mutations: {
+    setUser(state, { token, userId, tokenExpiration }) {
+      state.token = token;
+      state.userId = userId;
+      state.tokenExpiration = tokenExpiration;
+    },
+  },
 };

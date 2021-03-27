@@ -1,37 +1,52 @@
 <template>
-  <base-card>
-    <form @submit.prevent="submitForm">
-      <div class="form-control">
-        <label for="email">E-mail</label>
-        <input type="email" id="email" v-model.trim="email" />
-      </div>
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input type="password" id="password" v-model.trim="password" />
-      </div>
-      <p v-if="!formIsValid">
-        Please enter a valid email and password (must be at least 6 characters
-        long).
-      </p>
-      <base-button>{{ submitButtonCaption }}</base-button>
-      <base-button type="button" mode="flat" @click="switchAuthMode">{{
-        switchModeButtonCaption
-      }}</base-button>
-    </form>
-  </base-card>
+  <div>
+    <base-dialog :show="!!error" title="An error occured" @close="resetError">
+      <!-- !! forces boolean out of any truthy/falsey value -->
+      <p>{{ error }}</p>
+    </base-dialog>
+    <base-dialog :show="isLoading" title="Authenticating" fixed>
+      <base-spinner></base-spinner>
+    </base-dialog>
+    <base-card>
+      <form @submit.prevent="submitForm">
+        <div class="form-control">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" v-model.trim="email" />
+        </div>
+        <div class="form-control">
+          <label for="password">Password</label>
+          <input type="password" id="password" v-model.trim="password" />
+        </div>
+        <p v-if="!formIsValid">
+          Please enter a valid email and password (must be at least 6 characters
+          long).
+        </p>
+        <base-button>{{ submitButtonCaption }}</base-button>
+        <base-button type="button" mode="flat" @click="switchAuthMode">{{
+          switchModeButtonCaption
+        }}</base-button>
+      </form>
+    </base-card>
+  </div>
 </template>
 
 <script>
 import BaseButton from "../../components/ui/BaseButton.vue";
 import BaseCard from "../../components/ui/BaseCard.vue";
+import { mapActions } from "vuex";
+import BaseDialog from "../../components/ui/BaseDialog.vue";
+import BaseSpinner from "../../components/ui/BaseSpinner.vue";
+
 export default {
-  components: { BaseButton, BaseCard },
+  components: { BaseButton, BaseCard, BaseDialog, BaseSpinner },
   data() {
     return {
       email: "",
       password: "",
       formIsValid: true,
       mode: "login",
+      isLoading: false,
+      error: null,
     };
   },
   computed: {
@@ -39,12 +54,12 @@ export default {
       if (this.mode === "login") {
         return "Login";
       } else {
-        return "Signup";
+        return "Sign up";
       }
     },
     switchModeButtonCaption() {
       if (this.mode === "login") {
-        return "Signup instead";
+        return "Sign up instead";
       } else {
         return "Login instead";
       }
@@ -53,12 +68,12 @@ export default {
   methods: {
     switchAuthMode() {
       if (this.mode === "login") {
-        this.mode = "signup";
+        this.mode = "signUp";
       } else {
         this.mode = "login";
       }
     },
-    submitForm() {
+    async submitForm() {
       this.formIsValid = true;
       if (
         this.email === "" ||
@@ -68,8 +83,31 @@ export default {
         this.formIsValid = false;
         return;
       }
+
+      this.isLoading = true;
+
       // send http request to authenticate/create user and get token back from firebase
+      const actionPayload = {
+        email: this.email,
+        password: this.password,
+      };
+
+      try {
+        if (this.mode === "login") {
+          await this.login(actionPayload);
+        } else {
+          await this.signUp(actionPayload);
+        }
+      } catch (error) {
+        this.error = error.message || "Failed to authenticate, try later.";
+      }
+      // using async/await here because we want to set `isLoading` to false only after the signUp action has completed in vuex
+      this.isLoading = false;
     },
+    resetError() {
+      this.error = null;
+    },
+    ...mapActions("authModule", ["signUp", "login"]),
   },
 };
 </script>
