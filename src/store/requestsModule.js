@@ -7,7 +7,8 @@ export default {
   },
   getters: {
      requests({ requests }, _, _2, rootGetters) {
-       const { userId: coachId } = rootGetters;
+       console.log(rootGetters)
+       const coachId  = rootGetters['authModule/userId'];
        return requests.filter(request => request.coachId === coachId);
        // only want to show requests to the user that is logged in
      },
@@ -42,7 +43,7 @@ export default {
       commit('addRequest', newRequest)
     },
     async loadRequests({ commit, rootGetters }) {
-      const coachId = rootGetters.userId
+      const coachId = rootGetters['authModule/userId']
       
       const response = await fetch(
         `https://vue-coach-finder-2-default-rtdb.firebaseio.com/requests/${coachId}.json`
