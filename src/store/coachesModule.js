@@ -32,9 +32,11 @@ export default {
     hasCoaches({ coaches }) {
       return coaches && coaches.length > 0;
     },
-    isCoach({ coaches }, _, _2, { userId }) {
+    isCoach({ coaches }, _, _2, rootGetters) {
+      const userId = rootGetters['authModule/userId']
+      console.log(userId)
       return coaches.some((coach) => coach.id === userId);
-      // returns true if it finds at least one coach that has the same id as the `userId` root state property
+      // returns true if it finds at least one coach that has the same id as the `userId` authModule state property
     },
     shouldUpdate({ lastFetch }) {
       if (!lastFetch) {
@@ -47,7 +49,7 @@ export default {
   },
   actions: {
     async registerCoach(context, payload) {
-      const userId = context.rootGetters.userId;
+      const userId = context.rootGetters['authModule/userId'];
       const newCoachData = {
         ...payload, // using spread operator to copy payload here and then make changes (just adding a new property `id` to the obj)
         id: userId,
