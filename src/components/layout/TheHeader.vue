@@ -5,7 +5,13 @@
       <ul>
         <li>
           <router-link to="/coaches">All coaches</router-link>
-          <router-link to="/requests">Requests</router-link>
+          <router-link v-if="isAuthenticated" to="/requests"
+            >Requests</router-link
+          >
+          <router-link v-else to="/auth">Login</router-link>
+          <base-button v-if="isAuthenticated" @click="logout"
+            >Logout</base-button
+          >
         </li>
       </ul>
     </nav>
@@ -13,7 +19,18 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters, mapActions } from "vuex";
+import BaseButton from "../ui/BaseButton.vue";
+
+export default {
+  components: { BaseButton },
+  computed: {
+    ...mapGetters("authModule", ["isAuthenticated"]),
+  },
+  methods: {
+    ...mapActions("authModule", ["logout"]),
+  },
+};
 </script>
 
 <style scoped>

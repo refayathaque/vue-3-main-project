@@ -17,7 +17,8 @@
           <base-button mode="outline" @click="handleLoadCoaches(true)"
             >Refresh</base-button
           >
-          <base-button v-if="!isCoach && !isLoading" link to="/register"
+          <base-button link to="/auth" v-if="!isAuthenticated">Login</base-button>
+          <base-button v-if="isAuthenticated && !isCoach && !isLoading" link to="/register"
             >Register as coach</base-button
           >
           <!-- register button should only display if the user is not a registered coach and also when data is NOT loading -->
@@ -71,6 +72,7 @@ export default {
   },
   computed: {
     ...mapGetters("coachesModule", ["coaches", "hasCoaches", "isCoach"]),
+    ...mapGetters("authModule", ["isAuthenticated"]),
     handleHasCoaches() {
       return !this.loading && this.hasCoaches;
       // want to make sure that we return true only if there are coaches AND when data is NOT loading

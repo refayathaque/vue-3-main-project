@@ -16,6 +16,11 @@ export default {
     token({ token }) {
       return token;
     },
+    isAuthenticated({ token }) {
+      return !!token;
+      // safe to assume someone is logged in if there is a token in the local module state
+      // forcing boolean out of value with !!
+    },
   },
   actions: {
     async login(context, { email, password }) {
@@ -30,7 +35,7 @@ export default {
           }),
         }
       );
-      
+
       const responseData = await response.json();
 
       if (!response.ok) {
@@ -77,6 +82,13 @@ export default {
         token: responseData.idToken,
         userId: responseData.localId,
         tokenExpiration: responseData.expiresIn,
+      });
+    },
+    logout({ commit }) {
+      commit("setUser", {
+        token: null,
+        userId: null,
+        tokenExpiration: null,
       });
     },
   },
