@@ -1,4 +1,5 @@
 import api from "./api.js";
+import router from '../router';
 
 export default {
   namespaced: true,
@@ -90,6 +91,8 @@ export default {
         userId: null,
         tokenExpiration: null,
       });
+      router.replace('/coaches')
+      // example of programmatic navigation in a vuex store module
     },
   },
   mutations: {
