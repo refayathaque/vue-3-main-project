@@ -98,6 +98,8 @@ export default {
         } else {
           await this.signUp(actionPayload);
         }
+        this.$router.replace('/coaches')
+        // using `replace` because we don't need to let users 'go back' after being auth'ed
       } catch (error) {
         this.error = error.message || "Failed to authenticate, try later.";
       }
